@@ -6,6 +6,7 @@ using System.IO;
 public class osuFileReader : MonoBehaviour
 {
     public string outputDirectory;
+    public string oszFileName;
 
     private Animator gameCanvasAnimator;
     public Canvas gameCanvas;
@@ -45,6 +46,8 @@ public class osuFileReader : MonoBehaviour
 
         Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
 
+        oszFileName = filePath;
+
         foreach (string section in sections)
         {
             string[] lines = section.Split(new string[] { "\r\n", "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
@@ -70,15 +73,21 @@ public class osuFileReader : MonoBehaviour
 
     public void ProcessOsuFileSections(string filePath, Dictionary<string, string> keyValuePairs)
     {
+        //Path.GetDirectoryName
         string dictionariesPath = Path.Combine(Application.dataPath, "Dictionaries");
         Directory.CreateDirectory(dictionariesPath);
 
-        string song_dictionaryPath = Path.Combine(dictionariesPath, Path.GetFileNameWithoutExtension(filePath));
+        string song_dictionaryPath = Path.Combine(dictionariesPath, Path.GetFileNameWithoutExtension(Path.GetDirectoryName(filePath)));
         Directory.CreateDirectory(song_dictionaryPath);
 
-        outputDirectory = song_dictionaryPath;
+        string songdiff_dictionaryPath = Path.Combine(song_dictionaryPath, Path.GetFileNameWithoutExtension(filePath));
+        Directory.CreateDirectory(songdiff_dictionaryPath);
 
-        // Do something with the section (e.g. save to file)
+        outputDirectory = songdiff_dictionaryPath;
+
+        GUIUtility.systemCopyBuffer = outputDirectory;
+
+        // Saves the [Difficulty] .txt file
         SaveSectionToFile("Difficulty", keyValuePairs);
 
         Debug.Log("Processed " + filePath);
